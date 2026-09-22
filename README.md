@@ -40,14 +40,7 @@
 
 本项目提供 `linux/amd64` 和 `linux/arm64` 镜像，发布地址为
 `ghcr.io/ayanami-wu/cc98autosign-dockerize`。配置文件放在容器外的 `data` 目录中，
-不会被打包进镜像。
-
-如果 GHCR Package 仍为 Private，拉取前先使用具有 `read:packages` 权限的 GitHub
-Personal Access Token 登录；将 Package 设置为 Public 后可省略此步骤：
-
-```bash
-echo "$CR_PAT" | docker login ghcr.io -u Ayanami-WU --password-stdin
-```
+不会被打包进镜像。该 GHCR Package 已公开，目标机器无需登录即可拉取。
 
 先准备配置文件：
 
