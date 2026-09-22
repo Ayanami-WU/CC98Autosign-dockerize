@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+.dockerignore
+__pycache__
+*.py[cod]
+.mypy_cache
+.pytest_cache
+.venv
+venv
+build
+dist
+data
+config.json
+*.log

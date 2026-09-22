@@ -36,15 +36,64 @@
    pip install -r requirements.txt
    ```
 
-### 方法三：使用 GitHub Actions
+### 方法三：使用 Docker / GHCR 镜像
 
-该仓库已配置 GitHub Actions，可实现每天早上 8:00 自动签到
+本项目提供 `linux/amd64` 和 `linux/arm64` 镜像，发布地址为
+`ghcr.io/ayanami-wu/cc98autosign-dockerize`。配置文件放在容器外的 `data` 目录中，
+不会被打包进镜像。
+
+先准备配置文件：
+
+```bash
+mkdir -p data
+cp config.json.example data/config.json
+# 编辑 data/config.json，填入 WebVPN 和 CC98 账号信息
+```
+
+执行一次签到：
+
+```bash
+docker run --rm \
+  --name cc98-autosign \
+  -v "$PWD/data:/data" \
+  ghcr.io/ayanami-wu/cc98autosign-dockerize:main
+```
+
+持续运行、每小时执行一次签到：
+
+```bash
+docker run --rm \
+  --name cc98-autosign \
+  -v "$PWD/data:/data" \
+  ghcr.io/ayanami-wu/cc98autosign-dockerize:main \
+  --loop
+```
+
+也可以使用仓库中的 Compose 配置：
+
+```bash
+docker compose up --build
+```
+
+Compose 默认使用 `--loop`。该程序是命令行任务，不监听 HTTP 端口。
+
+如果需要本地构建镜像，将上述镜像名替换为 `cc98-autosign:local`，并先执行：
+
+```bash
+docker build -t cc98-autosign:local .
+```
+
+### 方法四：使用 GitHub Actions
+
+推送到 `main` 分支或创建 `v*` 标签时，GitHub Actions 会自动构建并发布 GHCR
+镜像；也可以在 Actions 页面手动运行 `Publish Docker image`。另有一个已停用的
+工作流可供需要时恢复，用于每天早上 8:00 自动签到。
 
 出于项目安全性的考虑，checkin.yml 处于停用状态
 
 #### 配置
 1. 点击仓库页面右上角的 Use this template 自建仓库（请勿 fork 该仓库）
-2. 恢复 ./github/workflows/checkin.yml 的重命名
+2. 将 `.github/workflows/checkin.yml.disabled` 重命名为 `.github/workflows/checkin.yml`
 3. 进入你自己的仓库的 Settings → Secrets → Actions
 4. 点击 New repository secret 按钮
 5. 添加以下 Secret：

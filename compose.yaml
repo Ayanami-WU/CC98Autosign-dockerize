@@ -1,0 +1,11 @@
+services:
+  cc98-autosign:
+    image: ghcr.io/ayanami-wu/cc98autosign-dockerize:main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    restart: "no"
+    volumes:
+      - ./data:/data
+    command: ["--loop"]
