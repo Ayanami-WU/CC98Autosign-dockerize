@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import re
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
@@ -13,6 +14,33 @@ import ZJUWebVPN
 
 from log import logger
 from user import AuthenticationError, SignInError, User
+
+
+def parse_interval(value: str) -> float:
+    """解析循环间隔，支持秒、分钟、小时和天。"""
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*([smhd]?)", value.strip().lower())
+    if not match:
+        raise argparse.ArgumentTypeError(
+            "间隔格式应为正数加 s/m/h/d，例如 90m、2h 或 1d"
+        )
+
+    amount = float(match.group(1))
+    if amount <= 0:
+        raise argparse.ArgumentTypeError("间隔必须大于 0")
+
+    multipliers = {"": 1, "s": 1, "m": 60, "h": 3600, "d": 86400}
+    return amount * multipliers[match.group(2)]
+
+
+def format_interval(seconds: float) -> str:
+    """将秒数格式化为日志中的中文间隔。"""
+    if seconds % 86400 == 0:
+        return f"{seconds / 86400:g} 天"
+    if seconds % 3600 == 0:
+        return f"{seconds / 3600:g} 小时"
+    if seconds % 60 == 0:
+        return f"{seconds / 60:g} 分钟"
+    return f"{seconds:g} 秒"
 
 
 def create_sample_config() -> None:
@@ -125,6 +153,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--loop", action="store_true", help="是否循环执行（默认不循环）"
     )
+    parser.add_argument(
+        "--interval",
+        type=parse_interval,
+        default=3600,
+        metavar="DURATION",
+        help="循环间隔，支持 s/m/h/d，例如 90m、2h（默认 1h）",
+    )
     args = parser.parse_args()
 
     while True:
@@ -171,8 +206,8 @@ if __name__ == "__main__":
 
             if not args.loop:
                 break
-            logger.info("等待 1 小时后再次执行...")
-            time.sleep(3600)  # 3600 seconds = 1 hours
+            logger.info(f"等待 {format_interval(args.interval)} 后再次执行...")
+            time.sleep(args.interval)
         except KeyboardInterrupt:
             logger.warning("程序被用户中断")
             break

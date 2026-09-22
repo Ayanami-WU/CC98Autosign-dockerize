@@ -69,6 +69,16 @@ docker run --rm \
   --loop
 ```
 
+可以使用 `--interval` 调整循环间隔，支持秒（`s`）、分钟（`m`）、小时（`h`）和天（`d`）：
+
+```bash
+# 每 2 小时执行一次
+docker run --rm \
+  -v "$PWD/data:/data" \
+  ghcr.io/ayanami-wu/cc98autosign-dockerize:main \
+  --loop --interval 2h
+```
+
 也可以使用仓库中的 Compose 配置：
 
 ```bash
@@ -158,12 +168,13 @@ python main.py
 
 ### 循环执行模式
 
-如果你希望程序每小时自动执行一次签到（适合在服务器上运行），可以使用 `--loop` 参数：
+如果你希望程序循环执行签到，可以使用 `--loop` 参数，并通过 `--interval` 调整间隔：
 
 ```bash
 CC98Autosign.exe --loop  # Windows
 ./CC98Autosign --loop  # Linux
 python main.py --loop  # Python
+python main.py --loop --interval 2h  # Python，每 2 小时执行一次
 ```
 
 ### Crontab
