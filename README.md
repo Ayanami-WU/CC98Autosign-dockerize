@@ -42,6 +42,13 @@
 `ghcr.io/ayanami-wu/cc98autosign-dockerize`。配置文件放在容器外的 `data` 目录中，
 不会被打包进镜像。
 
+如果 GHCR Package 仍为 Private，拉取前先使用具有 `read:packages` 权限的 GitHub
+Personal Access Token 登录；将 Package 设置为 Public 后可省略此步骤：
+
+```bash
+echo "$CR_PAT" | docker login ghcr.io -u Ayanami-WU --password-stdin
+```
+
 先准备配置文件：
 
 ```bash
